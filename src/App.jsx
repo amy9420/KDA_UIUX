@@ -110,6 +110,14 @@ export default function App() {
         setChatStage(0);
         setMessages([]);
         setQuery("");
+        setUploadPurpose("initial");
+        dispatch({
+          type: "conditions",
+          value: {
+            businessType: INITIAL_STATE.businessType,
+            purpose: INITIAL_STATE.purpose,
+          },
+        });
       }
       previousRoute.current = next || "intro";
       setScreen(Object.hasOwn(TITLES, next) ? next : "intro");
@@ -253,10 +261,9 @@ export default function App() {
       }
       if (action === "check") {
         dispatch({ type: "check" });
-        if (uploadPurpose === "correction") {
-          dispatch({ type: "recheck" });
-          go("rechecked");
-        } else go("results");
+        // Registration always leads to the first result. Only the detail screen
+        // can advance to the completed recheck result.
+        go("results");
       }
       if (action === "recheck") {
         dispatch({ type: "recheck" });
@@ -277,9 +284,17 @@ export default function App() {
       busyRef.current = false;
     }, 700);
   };
+  useEffect(() => {
+    if (screen === "results" && state.checked && state.corrected)
+      go("rechecked");
+    else if (screen === "results" && state.checked && state.staffRequested)
+      go("requested");
+  }, [screen, state.checked, state.corrected, state.staffRequested, go]);
+
   const results = getResults(state);
   const staffCount = results.filter((d) => d.status === "staff").length;
   const passCount = results.filter((d) => d.status === "pass").length;
+  const fixCount = results.filter((d) => d.status === "fix").length;
   const enterReview = () => {
     setSubmitConsent(false);
     go("review");
@@ -882,11 +897,21 @@ export default function App() {
         return state.checked ? (
           <div className="page results-page">
             <Heading>
-              서류 1건을
-              <br />
-              보완해 주세요
+              {fixCount ? (
+                <>
+                  서류 {fixCount}건을
+                  <br />
+                  보완해 주세요
+                </>
+              ) : (
+                <>
+                  서류 점검을
+                  <br />
+                  완료했어요
+                </>
+              )}
             </Heading>
-            <Summary pass={2} fix={1} staff={1} />
+            <Summary pass={passCount} fix={fixCount} staff={staffCount} />
             <div className="section-label">
               제출 서류 진단 리스트 <small>총 4건 접수</small>
             </div>
@@ -1002,7 +1027,7 @@ export default function App() {
               <br />
               정상 확인되었어요
             </Heading>
-            <Summary pass={3} staff={1} />
+            <Summary pass={passCount} fix={fixCount} staff={staffCount} />
             <div className="section-label">
               제출 서류 진단 리스트 <small>총 4건 접수</small>
             </div>

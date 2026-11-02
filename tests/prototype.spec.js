@@ -234,3 +234,50 @@ test("챗봇 재시작 시 초기화하고 재점검·제출 화면은 좌우 �
     main = await page.locator("main").boundingBox();
   expect(rect.x + rect.width).toBeLessThanOrEqual(main.x + main.width - 19);
 });
+
+test("보완 파일을 점검해도 결과→보완 상세→재점검 완료 순서를 건너뛰지 않는다", async ({
+  page,
+}) => {
+  await prepare(page);
+  await page.getByRole("button", { name: "파일 교체", exact: true }).click();
+  await page.getByRole("button", { name: /임대차계약서.pdf/ }).click();
+  await page
+    .getByRole("button", { name: "보완 서류 점검하기", exact: true })
+    .click();
+  await expect(page.locator("[data-screen=results]")).toBeVisible();
+  await expect(page.locator(".summary .issue")).toContainText("보완 필요1건");
+  await expect(page.locator(".result-card.needs-fix")).toContainText(
+    "임대차계약서",
+  );
+  await expect(page.locator(".result-card.passed")).toHaveCount(2);
+  await expect(page.locator(".result-card.staff")).toHaveCount(1);
+  await expect(page.locator(".summary")).toContainText("통과2건");
+  await expect(page.locator("[data-screen=rechecked]")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "보완 서류 확인", exact: true })
+    .click();
+  await expect(page.locator("[data-screen=detail]")).toBeVisible();
+  await page
+    .getByRole("button", { name: "다시 점검하기", exact: true })
+    .click();
+  await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
+  await expect(page.locator(".summary .zero")).toContainText("보완 필요0건");
+  await expect(page.locator(".result-card.needs-fix")).toHaveCount(0);
+  await expect(page.locator(".result-card.passed")).toHaveCount(3);
+  await expect(page.locator(".summary")).toContainText("통과3건");
+  await page.evaluate(() => {
+    location.hash = "results";
+  });
+  await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
+  await page.getByRole("button", { name: "닫기", exact: true }).click();
+  await page
+    .getByRole("button", { name: "서류 준비 시작하기", exact: true })
+    .click();
+  await page.getByRole("button", { name: "맞춤 준비 서류 보기" }).click();
+  await page
+    .getByRole("button", { name: "서류 준비하기", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "서류 점검하기", exact: true }),
+  ).toBeVisible();
+});

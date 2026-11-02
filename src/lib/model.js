@@ -47,7 +47,13 @@ export function reducer(state, action) {
         staffRequested: false,
       };
     case "fetch":
-      return { ...state, fetched: true, checked: false };
+      return {
+        ...state,
+        fetched: true,
+        checked: false,
+        corrected: false,
+        staffRequested: false,
+      };
     case "upload":
       return {
         ...state,
@@ -66,7 +72,7 @@ export function reducer(state, action) {
       };
     case "check":
       return state.upload
-        ? { ...state, checked: true, corrected: false }
+        ? { ...state, checked: true, corrected: false, staffRequested: false }
         : state;
     case "recheck":
       return state.upload && state.checked
