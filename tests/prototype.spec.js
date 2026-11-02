@@ -190,3 +190,47 @@ test("조회 화면은 준비 서류로 복귀하고 주요 화면의 마지막 
   await expect(page.locator("[data-screen=complete]")).toBeVisible();
   await fits(".complete-page .chat-link");
 });
+
+test("챗봇 재시작 시 초기화하고 재점검·제출 화면은 좌우 중앙 정렬을 유지한다", async ({
+  page,
+}) => {
+  await page.goto("/#chat");
+  await page
+    .getByRole("button", { name: "공동대표인 경우 필요한 서류는?" })
+    .click();
+  await expect(page.locator(".extra-message")).toHaveCount(1);
+  await page.getByRole("button", { name: "닫기", exact: true }).click();
+  await page
+    .getByRole("button", { name: "서류 준비 시작하기", exact: true })
+    .click();
+  await expect(page.locator(".extra-message")).toHaveCount(0);
+  await expect(page.locator(".conditions")).toHaveCount(0);
+  await expect(page.locator(".conditions")).toBeVisible();
+  await prepare(page);
+  await page
+    .getByRole("button", { name: "다시 점검하기", exact: true })
+    .click();
+  await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
+  await expect(page.locator(".summary .zero")).toContainText("보완 필요0건");
+  await expect(page.locator(".summary .issue")).toHaveCount(0);
+  async function centered(selector) {
+    const shell = await page.locator(".app-shell").boundingBox();
+    const el = await page.locator(selector).boundingBox();
+    expect(
+      Math.abs(el.x + el.width / 2 - shell.x - shell.width / 2),
+    ).toBeLessThan(1);
+  }
+  await centered(".summary");
+  await centered(".result-card:first-of-type");
+  await page.getByRole("button", { name: "제출 내용 확인하기" }).click();
+  await expect(page.locator("[data-screen=review]")).toBeVisible();
+  await centered(".review-status");
+  await centered(".accordion:first-of-type");
+  const consent = page.locator(".review-page .checkbox span");
+  await expect(consent).toHaveText(
+    "(필수) 서류와 점검 결과를 담당자에게 전달하는 데 동의합니다.",
+  );
+  const rect = await consent.boundingBox(),
+    main = await page.locator("main").boundingBox();
+  expect(rect.x + rect.width).toBeLessThanOrEqual(main.x + main.width - 19);
+});

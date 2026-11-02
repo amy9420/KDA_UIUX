@@ -67,6 +67,7 @@ export default function App() {
       : "intro",
   );
   const returns = useRef({});
+  const previousRoute = useRef(location.hash.slice(1) || "intro");
   const [chatStage, setChatStage] = useState(0);
   const [scrollbar, setScrollbar] = useState(null);
   const scrollTimer = useRef(null),
@@ -100,6 +101,17 @@ export default function App() {
   useEffect(() => {
     function changed() {
       const next = location.hash.slice(1);
+      if (
+        next === "chat" &&
+        !["chat", "files", "camera"].includes(previousRoute.current)
+      ) {
+        chatTimers.current.forEach(clearTimeout);
+        chatTimers.current = [];
+        setChatStage(0);
+        setMessages([]);
+        setQuery("");
+      }
+      previousRoute.current = next || "intro";
       setScreen(Object.hasOwn(TITLES, next) ? next : "intro");
       setError("");
       setModal(null);
@@ -343,9 +355,8 @@ export default function App() {
               ))}
             </ol>
             <Notice>
-              서류 제출을 돕는 사전점검 서비스예요.
-              <br />
-              대출 가능 여부나 한도를 심사하지 않아요.
+              서류 제출을 돕는 사전 점검 서비스로 대출가능 여부를 확정짓지
+              않아요.
             </Notice>
             <div className="actions">
               <Button arrow onClick={() => go("chat")}>
@@ -879,61 +890,7 @@ export default function App() {
             <div className="section-label">
               제출 서류 진단 리스트 <small>총 4건 접수</small>
             </div>
-            <button
-              className="result-card needs-fix"
-              onClick={() => go("detail")}
-            >
-              <div>
-                <h3>임대차계약서</h3>
-                <span className="tag danger">
-                  <Asset screen="225:4322" name="imgIcon10" />
-                  보완 필요
-                </span>
-                <Asset screen="225:4322" name="imgIcon6" />
-              </div>
-              <p>
-                <Asset screen="225:4322" name="imgIcon9" />
-                2페이지 글자가 흐려요
-              </p>
-              <small>
-                계약기간 항목을 읽기 어려워요. 원본 사진 또는 스캔본을 다시
-                등록해 주세요.
-              </small>
-              <span className="text-link">
-                상세보기 <Asset screen="225:4322" name="imgIcon8" />
-              </span>
-            </button>
-            <article className="result-card staff">
-              <div>
-                <h3>부가가치세 과세표준증명</h3>
-                <span className="tag">
-                  <Asset screen="225:4322" name="imgIcon6" />
-                  직원 확인 필요
-                </span>
-              </div>
-              <p>
-                <Asset screen="225:4322" name="imgIcon5" />
-                대상 기간 확인
-              </p>
-              <small>
-                신청 상품의 대상 기간과 일치하는지 담당자가 확인해요.
-              </small>
-            </article>
-            {DOCUMENTS.slice(0, 2).map((d) => (
-              <div className="result-card passed" key={d.id}>
-                <div>
-                  <h3>{d.name}</h3>
-                  <span className="tag success">
-                    <Asset screen="225:4322" name="imgIcon4" />
-                    통과
-                  </span>
-                </div>
-                <p>
-                  <Asset screen="225:4322" name="imgIcon3" />
-                  정상 확인
-                </p>
-              </div>
-            ))}
+            <ResultCards results={results} onDetail={() => go("detail")} />
             <Notice>
               <strong>스마트 서류 재촬영 팁</strong>
               <br />
@@ -1159,7 +1116,7 @@ export default function App() {
               checked={submitConsent}
               onChange={setSubmitConsent}
             >
-              서류와 점검 결과를 담당자에게 전달하는 데 동의합니다 (필수)
+              (필수) 서류와 점검 결과를 담당자에게 전달하는 데 동의합니다.
             </Checkbox>
             <button
               className="text-link small consent-detail"
@@ -1588,13 +1545,11 @@ function Summary({ pass = 0, fix = 0, staff = 0 }) {
         <span>통과</span>
         <strong>{pass}건</strong>
       </div>
-      {fix > 0 && (
-        <div className="issue">
-          <Asset screen="225:4322" name="imgIcon1" />
-          <span>보완 필요</span>
-          <strong>{fix}건</strong>
-        </div>
-      )}
+      <div className={fix > 0 ? "issue" : "zero"}>
+        <Asset screen="225:4322" name="imgIcon1" />
+        <span>보완 필요</span>
+        <strong>{fix}건</strong>
+      </div>
       <div>
         <Asset screen="225:4322" name="imgIcon" />
         <span>직원 확인</span>
@@ -1617,28 +1572,54 @@ function modalTitle(modal) {
   }[modal.type];
 }
 
-function ResultCards({ results }) {
+function ResultCards({ results, onDetail }) {
   return ["lease", "tax", "business", "income"]
     .map((id) => results.find((d) => d.id === id))
-    .map((d) => (
-      <article
-        className={`result-card ${d.status === "staff" ? "staff" : "passed"}`}
-        key={d.id}
-      >
-        <div>
-          <h3>{d.name}</h3>
-          <span className={`tag ${d.status === "staff" ? "" : "success"}`}>
-            {d.status === "staff" ? "직원 확인 필요" : "통과"}
-          </span>
-          <Asset
-            screen="225:4322"
-            name={d.status === "staff" ? "imgIcon7" : "imgIcon3"}
-          />
-        </div>
-        <p>{d.status === "staff" ? "대상 기간 확인" : "정상 확인"}</p>
-        {d.status === "staff" && (
-          <small>신청 상품의 대상 기간과 일치하는지 담당자가 확인해요.</small>
-        )}
-      </article>
-    ));
+    .map((d) => {
+      const fix = d.status === "fix",
+        staff = d.status === "staff";
+      const Tag = fix ? "button" : "article";
+      return (
+        <Tag
+          key={d.id}
+          className={`result-card ${fix ? "needs-fix" : staff ? "staff" : "passed"}`}
+          {...(fix ? { onClick: onDetail } : {})}
+        >
+          <div>
+            <h3>{d.name}</h3>
+            <span className={`tag ${fix ? "danger" : staff ? "" : "success"}`}>
+              <Asset
+                screen="225:4322"
+                name={fix ? "imgIcon10" : staff ? "imgIcon7" : "imgIcon4"}
+              />
+              {fix ? "보완 필요" : staff ? "직원 확인 필요" : "통과"}
+            </span>
+            {fix && <Asset screen="225:4322" name="imgIcon6" />}
+          </div>
+          <p>
+            <Asset
+              screen="225:4322"
+              name={fix ? "imgIcon9" : staff ? "imgIcon5" : "imgIcon3"}
+            />
+            {fix
+              ? "2페이지 글자가 흐려요"
+              : staff
+                ? "대상 기간 확인"
+                : "정상 확인"}
+          </p>
+          {(fix || staff) && (
+            <small>
+              {fix
+                ? "계약기간 항목을 읽기 어려워요. 원본 사진 또는 스캔본을 다시 등록해 주세요."
+                : "신청 상품의 대상 기간과 일치하는지 담당자가 확인해요."}
+            </small>
+          )}
+          {fix && (
+            <span className="text-link">
+              상세보기 <Asset screen="225:4322" name="imgIcon8" />
+            </span>
+          )}
+        </Tag>
+      );
+    });
 }
