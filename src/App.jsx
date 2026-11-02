@@ -66,6 +66,12 @@ export default function App() {
       ? location.hash.slice(1)
       : "intro",
   );
+  const returns = useRef({});
+  const [chatStage, setChatStage] = useState(0);
+  const [scrollbar, setScrollbar] = useState(null);
+  const scrollTimer = useRef(null),
+    chatTimers = useRef([]);
+  const [voiceReady, setVoiceReady] = useState(false);
   const [modal, setModal] = useState(null);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
@@ -83,7 +89,12 @@ export default function App() {
     uploadUrl = useRef(null),
     timer = useRef(null);
   const go = useCallback((to) => {
-    if (Object.hasOwn(TITLES, to)) location.hash = to;
+    if (Object.hasOwn(TITLES, to)) {
+      const from = location.hash.slice(1) || "intro";
+      if (["files", "auto-consent", "camera"].includes(to) && from !== to)
+        returns.current[to] = from;
+      location.hash = to;
+    }
   }, []);
   const closeModal = useCallback(() => setModal(null), []);
   useEffect(() => {
@@ -98,6 +109,8 @@ export default function App() {
   }, []);
   useEffect(() => {
     main.current?.scrollTo(0, 0);
+    setToast("");
+    setScrollbar(null);
     document.title = `${TITLES[screen]} | 하나원큐 시연`;
   }, [screen]);
   useEffect(
@@ -113,7 +126,55 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const back = () => go(DEFAULT_BACK[screen] || "intro");
+  const back = () =>
+    go(returns.current[screen] || DEFAULT_BACK[screen] || "intro");
+  useEffect(() => {
+    if (screen !== "chat" || chatStage >= 3) return;
+    const timers = [
+      setTimeout(() => setChatStage(1), 300),
+      setTimeout(() => setChatStage(2), 1200),
+      setTimeout(() => setChatStage(3), 2200),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [screen]);
+  useEffect(() => {
+    if (screen !== "chat") return;
+    requestAnimationFrame(() =>
+      main.current?.scrollTo({
+        top: main.current.scrollHeight,
+        behavior: "smooth",
+      }),
+    );
+  }, [messages, chatStage]);
+  useEffect(
+    () => () => {
+      chatTimers.current.forEach(clearTimeout);
+      clearTimeout(scrollTimer.current);
+    },
+    [],
+  );
+  useEffect(() => {
+    if (modal?.type !== "voice") return;
+    setVoiceReady(false);
+    const t = setTimeout(() => setVoiceReady(true), 1800);
+    return () => clearTimeout(t);
+  }, [modal?.type]);
+  const showScroll = () => {
+    const el = main.current;
+    if (!el || el.scrollHeight <= el.clientHeight) return;
+    const height = Math.max(
+      25,
+      (el.clientHeight * el.clientHeight) / el.scrollHeight,
+    );
+    setScrollbar({
+      height,
+      top:
+        (el.scrollTop / (el.scrollHeight - el.clientHeight)) *
+        (el.clientHeight - height),
+    });
+    clearTimeout(scrollTimer.current);
+    scrollTimer.current = setTimeout(() => setScrollbar(null), 800);
+  };
   const register = (file, sample = false) => {
     const message = sample ? "" : validateFile(file);
     if (message) {
@@ -212,15 +273,27 @@ export default function App() {
     go("review");
   };
   const sendMessage = (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    const text = query.trim();
-    const reply = /서류|준비/.test(text)
-      ? "기업 형태와 자금 용도를 확인한 뒤 맞춤 준비 서류를 확인해 주세요. 실제 제출 요건은 신청 상품에 따라 달라질 수 있어요."
-      : /확정|공동/.test(text)
-        ? "추가 서류나 계약서 인정 기준은 상품과 신청 상황에 따라 달라져요. 서류 안내를 확인하거나 담당자에게 문의해 주세요."
-        : "이 화면은 기업대출 서류 준비를 안내하는 시연용 챗봇이에요. 아래에서 기업 형태와 자금 용도를 선택해 주세요.";
-    setMessages((m) => [...m, { user: text, reply }]);
+    if (typeof e !== "string") e.preventDefault();
+    if (typeof e !== "string" && !query.trim()) return;
+    const text = typeof e === "string" ? e : query.trim();
+    const reply = /공동/.test(text)
+      ? "공동대표인 경우 대표자 확인과 추가 동의 서류가 필요할 수 있어요. 정확한 추가 서류는 신청 상품과 대표 방식에 따라 담당자에게 확인해 주세요."
+      : /확정/.test(text)
+        ? "임대차계약서의 확정일자 필요 여부는 신청 상품과 계약 조건에 따라 달라져요. 계약서의 임대차 기간과 서명을 먼저 확인하고 담당자에게 인정 기준을 문의해 주세요."
+        : /서류|준비/.test(text)
+          ? "기업 형태와 자금 용도를 확인한 뒤 맞춤 준비 서류를 확인해 주세요. 실제 제출 요건은 신청 상품에 따라 달라질 수 있어요."
+          : "이 화면은 기업대출 서류 준비를 안내하는 시연용 챗봇이에요. 기업 형태와 자금 용도를 선택해 주세요.";
+    const id = crypto.randomUUID();
+    setMessages((m) => [...m, { id, user: text, reply: null }]);
+    chatTimers.current.push(
+      setTimeout(
+        () =>
+          setMessages((m) =>
+            m.map((item) => (item.id === id ? { ...item, reply } : item)),
+          ),
+        850,
+      ),
+    );
     setQuery("");
     requestAnimationFrame(() =>
       main.current?.scrollTo({
@@ -239,7 +312,7 @@ export default function App() {
               <Asset name="imgIcon2" />
               Hana AI 서류 검증 솔루션
             </div>
-            <Heading description="영업점 방문 전 필요한 서류를 미리 확인하고 점검할 수 있습니다.">
+            <Heading description="영업점 방문 전, 필요한 서류를 확인하세요.">
               기업대출 서류,
               <br />
               제출 전에 확인하세요
@@ -270,8 +343,9 @@ export default function App() {
               ))}
             </ol>
             <Notice>
-              사전점검은 대출 가능 여부나 한도를 심사하는 절차가 아니에요.
-              원활한 서류 제출을 돕기 위한 보조 서비스입니다.
+              서류 제출을 돕는 사전점검 서비스예요.
+              <br />
+              대출 가능 여부나 한도를 심사하지 않아요.
             </Notice>
             <div className="actions">
               <Button arrow onClick={() => go("chat")}>
@@ -291,117 +365,136 @@ export default function App() {
             <h1>
               김하나 고객님 안녕하세요.
               <br />
-              기업대출 서류 준비를 도와드릴게요.
+              기업 서류 준비를 도와드릴게요.
             </h1>
-            <div className="bot-message">
-              <div className="bot-avatar">하이</div>
-              <div>
-                <span className="bot-name">하이봇</span>
-                <div className="bubble">
-                  어떤 사업을 운영 중이신가요? 조건에 맞춰 꼭 필요한 서류 목록을
-                  정리해 드릴게요.
+            {chatStage >= 1 && (
+              <div className="bot-message message-enter">
+                <div className="bot-avatar">하이</div>
+                <div>
+                  <span className="bot-name">하이봇</span>
+                  <div className="bubble">
+                    어떤 사업을 운영 중이신가요? 조건에 맞춰 꼭 필요한 서류
+                    목록을 정리해 드릴게요.
+                  </div>
+                  <small>오전 09:42</small>
                 </div>
-                <small>오전 09:42</small>
               </div>
-            </div>
-            <div className="user-message">
-              {state.businessType}이고{" "}
-              {state.purpose === "운전자금" ? "가게 운영자금" : "시설자금"}이
-              필요해요
-            </div>
-            <p className="message-time">읽음　오전 09:42</p>
-            <div className="bot-message">
-              <div className="bot-avatar">하이</div>
-              <div className="bot-column">
-                <span className="bot-name">하이봇</span>
-                <div className="bubble conditions">
-                  <p>
-                    기업 형태와 자금 용도를 선택하시면
-                    <br />더 정확해요.
-                  </p>
-                  <fieldset>
-                    <legend>기업 형태</legend>
-                    {["개인사업자", "법인사업자"].map((type) => (
-                      <button
-                        key={type}
-                        className={`chip ${state.businessType === type ? "selected" : ""}`}
-                        aria-pressed={state.businessType === type}
-                        onClick={() =>
-                          dispatch({
-                            type: "conditions",
-                            value: { businessType: type },
-                          })
-                        }
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </fieldset>
-                  <fieldset>
-                    <legend>자금 용도</legend>
-                    {["운전자금", "시설자금"].map((purpose) => (
-                      <button
-                        key={purpose}
-                        className={`chip ${state.purpose === purpose ? "selected" : ""}`}
-                        aria-pressed={state.purpose === purpose}
-                        onClick={() =>
-                          dispatch({ type: "conditions", value: { purpose } })
-                        }
-                      >
-                        {purpose}
-                      </button>
-                    ))}
-                  </fieldset>
-                  <div className="chat-result">
-                    <div className="chat-result-title">
-                      <Asset screen="225:4625" name="imgIcon4" />
-                      <div>
-                        <strong>맞춤 서류 진단 완료</strong>
-                        <p>
-                          {state.businessType} {state.purpose} 맞춤 서류가
-                          준비되었어요.
-                        </p>
+            )}
+            {chatStage >= 2 && (
+              <>
+                <div className="user-message message-enter">
+                  {state.businessType}이고{" "}
+                  {state.purpose === "운전자금" ? "가게 운영자금" : "시설자금"}
+                  이 필요해요
+                </div>
+                <p className="message-time">읽음　오전 09:42</p>
+              </>
+            )}
+            {chatStage >= 3 && (
+              <>
+                <div className="bot-message message-enter">
+                  <div className="bot-avatar">하이</div>
+                  <div className="bot-column">
+                    <span className="bot-name">하이봇</span>
+                    <div className="bubble conditions">
+                      <p>
+                        기업 형태와 자금 용도를 선택하시면
+                        <br />더 정확해요.
+                      </p>
+                      <fieldset>
+                        <legend>기업 형태</legend>
+                        {["개인사업자", "법인사업자"].map((type) => (
+                          <button
+                            key={type}
+                            className={`chip ${state.businessType === type ? "selected" : ""}`}
+                            aria-pressed={state.businessType === type}
+                            onClick={() =>
+                              dispatch({
+                                type: "conditions",
+                                value: { businessType: type },
+                              })
+                            }
+                          >
+                            {type}
+                          </button>
+                        ))}
+                      </fieldset>
+                      <fieldset>
+                        <legend>자금 용도</legend>
+                        {["운전자금", "시설자금"].map((purpose) => (
+                          <button
+                            key={purpose}
+                            className={`chip ${state.purpose === purpose ? "selected" : ""}`}
+                            aria-pressed={state.purpose === purpose}
+                            onClick={() =>
+                              dispatch({
+                                type: "conditions",
+                                value: { purpose },
+                              })
+                            }
+                          >
+                            {purpose}
+                          </button>
+                        ))}
+                      </fieldset>
+                      <div className="chat-result">
+                        <div className="chat-result-title">
+                          <Asset screen="225:4625" name="imgIcon4" />
+                          <div>
+                            <strong>맞춤 서류 진단 완료</strong>
+                            <p>
+                              {state.businessType} {state.purpose} 맞춤 서류가
+                              준비되었어요.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="document-chips">
+                          {DOCUMENTS.map((d) => (
+                            <span key={d.id}>
+                              <Asset screen="225:4625" name="imgIcon2" />
+                              {d.name}
+                            </span>
+                          ))}
+                        </div>
+                        <Button onClick={() => go("documents")}>
+                          맞춤 준비 서류 보기{" "}
+                          <Asset screen="225:4625" name="imgIcon3" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="document-chips">
-                      {DOCUMENTS.map((d) => (
-                        <span key={d.id}>
-                          <Asset screen="225:4625" name="imgIcon2" />
-                          {d.name}
-                        </span>
-                      ))}
-                    </div>
-                    <Button onClick={() => go("documents")}>
-                      맞춤 준비 서류 보기{" "}
-                      <Asset screen="225:4625" name="imgIcon3" />
-                    </Button>
+                    <small>오전 09:43</small>
                   </div>
                 </div>
-                <small>오전 09:43</small>
-              </div>
-            </div>
-            <div className="suggestions">
-              <p>
-                <Asset screen="225:4625" name="imgIcon1" />
-                자주 묻는 질문 추천
-              </p>
-              {[
-                "공동대표인 경우 필요한 서류는?",
-                "임대차계약서 확정일자가 필요한가요?",
-              ].map((question) => (
-                <button
-                  key={question}
-                  onClick={() => setModal({ type: "faq", title: question })}
-                >
-                  {question}
-                  <Asset screen="225:4625" name="imgIcon" />
-                </button>
-              ))}
-            </div>
+                <div className="suggestions">
+                  <p>
+                    <Asset screen="225:4625" name="imgIcon1" />
+                    자주 묻는 질문 추천
+                  </p>
+                  {[
+                    "공동대표인 경우 필요한 서류는?",
+                    "임대차계약서 확정일자가 필요한가요?",
+                  ].map((question) => (
+                    <button
+                      key={question}
+                      onClick={() => sendMessage(question)}
+                    >
+                      {question}
+                      <Asset screen="225:4625" name="imgIcon" />
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
             {messages.map((m, i) => (
               <div className="extra-message" key={i}>
                 <div className="user-message">{m.user}</div>
-                <div className="bubble">{m.reply}</div>
+                <div className="bubble message-enter">
+                  {m.reply || (
+                    <span className="typing" aria-label="하이봇이 답변 중">
+                      ● ● ●
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -733,7 +826,7 @@ export default function App() {
               내 기기에서 파일 선택
             </Button>
             <div className="bottom-content">
-              <Button secondary onClick={() => go("upload")}>
+              <Button secondary onClick={back}>
                 취소
               </Button>
             </div>
@@ -846,9 +939,7 @@ export default function App() {
               <br />
               그림자가 생기지 않도록 밝은 곳에서 촬영해 주세요.
             </Notice>
-            <p className="disclaimer">
-              사전점검은 대출 승인을 의미하지 않습니다.
-            </p>
+
             <Button arrow onClick={() => go("detail")}>
               보완 서류 확인
             </Button>
@@ -948,23 +1039,17 @@ export default function App() {
 
       case "rechecked":
         return state.corrected ? (
-          <div className="page simple-page">
+          <div className="page results-page rechecked-page">
             <Heading eyebrow="재점검 완료">
               보완한 서류가
               <br />
               정상 확인되었어요
             </Heading>
             <Summary pass={3} staff={1} />
-            <div className="result-lines">
-              {results.map((d) => (
-                <div key={d.id}>
-                  <span>{d.name}</span>
-                  <small className={d.status === "pass" ? "green" : ""}>
-                    {d.status === "pass" ? "통과" : "직원 확인"}
-                  </small>
-                </div>
-              ))}
+            <div className="section-label">
+              제출 서류 진단 리스트 <small>총 4건 접수</small>
             </div>
+            <ResultCards results={results} />
             <Notice>
               확인이 필요한 항목은 담당자에게 전달돼요.
               <br />
@@ -1013,12 +1098,21 @@ export default function App() {
       case "review":
         return canSubmit(state) ? (
           <div className="page review-page">
-            <Heading description="제출할 서류와 점검 결과를 확인해 주세요.">
+            <Heading description="영업점 담당자가 전달받은 서류로 신속하게 심사를 준비합니다.">
               담당자에게 서류를
               <br />
               전달할까요?
             </Heading>
-            <Summary pass={passCount} staff={staffCount} />
+            <div className="review-status">
+              <Asset screen="225:4167" name="imgIcon6" />
+              <div>
+                <small>서류 취합 상태</small>
+                <strong>
+                  통과 {passCount}건 <span>· 직원 확인 {staffCount}건</span>
+                </strong>
+              </div>
+              <b>총 4건</b>
+            </div>
             <details className="accordion" open>
               <summary>
                 제출 서류 (4건)
@@ -1033,7 +1127,7 @@ export default function App() {
                     />
                     <span>{d.name}</span>
                     <small className={d.status === "staff" ? "" : "green"}>
-                      {d.status === "staff" ? "직원 확인" : "통과"}
+                      {d.status === "staff" ? "직원 검토" : "자동 적합"}
                     </small>
                   </div>
                 ))}
@@ -1108,12 +1202,12 @@ export default function App() {
               </span>
               <i />
               <span>
-                <Asset screen="225:4060" name="imgIcon5" />
+                <Asset screen="225:4322" name="imgIcon7" />
                 담당 검토
               </span>
               <i />
               <span>
-                <Asset screen="225:4060" name="imgIcon7" />
+                <Asset screen="225:4060" name="imgIcon5" />
                 결과 안내
               </span>
             </div>
@@ -1153,7 +1247,8 @@ export default function App() {
             <Notice>
               <strong>추가 서류가 필요하면 알려드릴게요</strong>
               <br />
-              실제 접수가 아닌 프론트엔드 시연 결과입니다.
+              심사 진행 중 미비한 서류가 발생할 경우 하나원큐 알림톡으로
+              신속하게 안내해 드립니다.
             </Notice>
             <Button onClick={() => go("applications")}>나의 신청 확인</Button>
             <button className="chat-link" onClick={() => go("chat")}>
@@ -1221,10 +1316,19 @@ export default function App() {
           chat={screen === "chat"}
           onBack={back}
           onChat={() => go("chat")}
-          onClose={screen !== "intro" ? () => go("intro") : undefined}
+          onClose={
+            screen !== "intro"
+              ? ["files", "auto-consent", "camera"].includes(screen)
+                ? back
+                : () => go("intro")
+              : undefined
+          }
         />
         <main
           className="app-main"
+          onScroll={showScroll}
+          onWheel={showScroll}
+          onTouchMove={showScroll}
           ref={main}
           id="main-content"
           aria-label={TITLES[screen]}
@@ -1255,14 +1359,31 @@ export default function App() {
             />
             <button
               className="icon-button send"
-              aria-label="메시지 보내기"
-              disabled={!query.trim()}
+              type={query.trim() ? "submit" : "button"}
+              aria-label={query.trim() ? "메시지 보내기" : "음성 입력"}
+              onClick={() => {
+                if (!query.trim()) setModal({ type: "voice" });
+              }}
             >
-              <Asset screen="225:4625" name="imgContainer1" />
+              {query.trim() ? (
+                <span aria-hidden="true">↑</span>
+              ) : (
+                <Asset screen="225:4625" name="imgContainer1" />
+              )}
             </button>
           </form>
         )}
       </div>
+      {scrollbar && (
+        <div className="scroll-indicator" aria-hidden="true">
+          <span
+            style={{
+              height: scrollbar.height,
+              transform: `translateY(${scrollbar.top}px)`,
+            }}
+          />
+        </div>
+      )}
       <input
         className="sr-only"
         ref={picker}
@@ -1413,6 +1534,35 @@ export default function App() {
           {modal.type === "preview" && (
             <DocumentPreview upload={state.upload} selectedPage={page} large />
           )}
+          {modal.type === "voice" && (
+            <div className="voice-demo">
+              <div className="voice-orb">
+                <Asset screen="225:4625" name="imgContainer1" />
+              </div>
+              <div className="voice-wave" aria-hidden="true">
+                {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                  <i key={n} style={{ animationDelay: `${n * 0.12}s` }} />
+                ))}
+              </div>
+              <p role="status">
+                {voiceReady
+                  ? "개인사업자이고 가게 운영자금이 필요해요"
+                  : "말씀하신 내용을 듣고 있어요…"}
+              </p>
+              <small>
+                음성 입력 체험 화면이에요. 실제 마이크는 사용하지 않아요.
+              </small>
+              <Button
+                disabled={!voiceReady}
+                onClick={() => {
+                  setModal(null);
+                  sendMessage("개인사업자이고 가게 운영자금이 필요해요");
+                }}
+              >
+                이 내용 보내기
+              </Button>
+            </div>
+          )}
           {modal.type === "copy" && (
             <p className="selectable">{state.receipt?.id}</p>
           )}
@@ -1463,5 +1613,32 @@ function modalTitle(modal) {
     consent: "서류 전달 동의",
     preview: "원문 미리보기",
     copy: "접수번호",
+    voice: "음성으로 입력하기",
   }[modal.type];
+}
+
+function ResultCards({ results }) {
+  return ["lease", "tax", "business", "income"]
+    .map((id) => results.find((d) => d.id === id))
+    .map((d) => (
+      <article
+        className={`result-card ${d.status === "staff" ? "staff" : "passed"}`}
+        key={d.id}
+      >
+        <div>
+          <h3>{d.name}</h3>
+          <span className={`tag ${d.status === "staff" ? "" : "success"}`}>
+            {d.status === "staff" ? "직원 확인 필요" : "통과"}
+          </span>
+          <Asset
+            screen="225:4322"
+            name={d.status === "staff" ? "imgIcon7" : "imgIcon3"}
+          />
+        </div>
+        <p>{d.status === "staff" ? "대상 기간 확인" : "정상 확인"}</p>
+        {d.status === "staff" && (
+          <small>신청 상품의 대상 기간과 일치하는지 담당자가 확인해요.</small>
+        )}
+      </article>
+    ));
 }

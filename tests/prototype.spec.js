@@ -69,31 +69,29 @@ test("직원 확인 요청과 취소, 키보드 팝업 조작이 작동한다", 
     .getByRole("button", { name: "확인 요청하기", exact: true })
     .click();
   await page.getByRole("button", { name: "제출 내용 확인하기" }).click();
-  await expect(page.locator(".summary").getByText("2건")).toHaveCount(2);
+  await expect(page.locator(".review-status")).toContainText(
+    "통과 2건 · 직원 확인 2건",
+  );
 });
 
 test("실제 이미지 파일 등록, 잘못된 형식 거절, 삭제 후 점검 비활성화", async ({
   page,
 }) => {
   await page.goto("/#upload");
-  await page
-    .getByLabel("서류 파일", { exact: true })
-    .setInputFiles({
-      name: "invalid.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("sample"),
-    });
+  await page.getByLabel("서류 파일", { exact: true }).setInputFiles({
+    name: "invalid.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("sample"),
+  });
   await expect(page.getByRole("alert")).toContainText("PDF, PNG, JPG, WEBP");
-  await page
-    .getByLabel("서류 파일", { exact: true })
-    .setInputFiles({
-      name: "contract.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=",
-        "base64",
-      ),
-    });
+  await page.getByLabel("서류 파일", { exact: true }).setInputFiles({
+    name: "contract.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
   await expect(page.getByText("contract.png", { exact: true })).toBeVisible();
   await expect(page.locator(".uploaded-image")).toBeVisible();
   await page.getByRole("button", { name: "삭제", exact: true }).click();
@@ -128,4 +126,67 @@ test("모바일 화면이 가로로 넘치지 않고 헤더를 유지하며 스�
         .evaluate((el) => el.scrollWidth <= el.clientWidth),
     ).toBe(true);
   }
+});
+
+test("챗봇 순차 등장, 질문 전송, 첨부 취소와 음성 체험", async ({ page }) => {
+  await page.goto("/#chat");
+  await expect(page.locator(".conditions")).toHaveCount(0);
+  await expect(page.locator(".conditions")).toBeVisible();
+  await page
+    .getByRole("button", { name: "공동대표인 경우 필요한 서류는?" })
+    .click();
+  await expect(page.locator(".extra-message .user-message")).toHaveText(
+    "공동대표인 경우 필요한 서류는?",
+  );
+  await expect(page.locator(".extra-message .bubble")).toContainText(
+    "추가 서류",
+  );
+  await page.getByRole("button", { name: "서류 첨부", exact: true }).click();
+  await page.getByRole("button", { name: "취소", exact: true }).click();
+  await expect(page.locator("[data-screen=chat]")).toBeVisible();
+  await page.getByRole("button", { name: "서류 첨부", exact: true }).click();
+  await page.getByRole("button", { name: "닫기", exact: true }).click();
+  await expect(page.locator("[data-screen=chat]")).toBeVisible();
+  await page.getByRole("button", { name: "음성 입력", exact: true }).click();
+  await expect(page.getByRole("dialog")).toContainText(
+    "실제 마이크는 사용하지 않아요",
+  );
+  await page.getByRole("button", { name: "이 내용 보내기" }).click();
+  await expect(
+    page.locator(".extra-message .user-message").last(),
+  ).toContainText("개인사업자이고");
+});
+
+test("조회 화면은 준비 서류로 복귀하고 주요 화면의 마지막 버튼이 한 화면에 들어간다", async ({
+  page,
+}) => {
+  async function fits(selector) {
+    const main = await page.locator("main").boundingBox();
+    const box = await page.locator(selector).boundingBox();
+    expect(box.y + box.height).toBeLessThanOrEqual(main.y + main.height + 1);
+  }
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  await fits(".intro .chat-link");
+  await page
+    .getByRole("button", { name: "서류 준비 시작하기", exact: true })
+    .click();
+  await page.getByRole("button", { name: "맞춤 준비 서류 보기" }).click();
+  await page.locator(".document-meta .text-link").first().click();
+  await expect(page.locator('[data-screen="auto-consent"]')).toBeVisible();
+  await page.getByRole("button", { name: "뒤로가기" }).click();
+  await expect(page.locator('[data-screen="documents"]')).toBeVisible();
+  await page.locator(".document-meta .text-link").first().click();
+  await page.getByRole("button", { name: "닫기", exact: true }).click();
+  await expect(page.locator('[data-screen="documents"]')).toBeVisible();
+  await prepare(page);
+  await page
+    .getByRole("button", { name: "다시 점검하기", exact: true })
+    .click();
+  await page.getByRole("button", { name: "제출 내용 확인하기" }).click();
+  await expect(page.locator("[data-screen=review]")).toBeVisible();
+  await page.getByRole("checkbox", { name: /서류와 점검 결과를/ }).check();
+  await page.getByRole("button", { name: "담당자에게 제출하기" }).click();
+  await expect(page.locator("[data-screen=complete]")).toBeVisible();
+  await fits(".complete-page .chat-link");
 });

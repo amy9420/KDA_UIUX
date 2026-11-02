@@ -238,7 +238,20 @@ export function DocumentPreview({
                   {large && (
                     <>
                       <strong>부동산 임대차계약서</strong>
-                      <span className="paper-caption">제2조 (임대차 기간)</span>
+                      <span className="document-lines">
+                        <i />
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                      <span className="paper-caption">
+                        <b>● 제2조 (임대차 기간)</b>
+                        <em>인식 불가</em>
+                        <span className="blurred-lines">
+                          <i />
+                          <i />
+                        </span>
+                      </span>
                     </>
                   )}
                   <span />
