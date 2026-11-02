@@ -30,13 +30,21 @@ async function prepare(page) {
   await page.getByRole("button", { name: "보완 서류 확인" }).click();
 }
 
+async function chooseCorrected(page) {
+  await page.getByRole("button", { name: "파일 교체", exact: true }).click();
+  await page
+    .getByRole("button", { name: "임대차계약서_보완.pdf", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "보완 서류 점검하기", exact: true })
+    .click();
+}
+
 test("보완 재점검과 필수 동의 후 제출 내역까지 이동한다", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await prepare(page);
-  await page
-    .getByRole("button", { name: "다시 점검하기", exact: true })
-    .click();
+  await chooseCorrected(page);
   await page.getByRole("button", { name: "제출 내용 확인하기" }).click();
   const submit = page.getByRole("button", { name: "담당자에게 제출하기" });
   await expect(submit).toBeDisabled();
@@ -180,9 +188,7 @@ test("조회 화면은 준비 서류로 복귀하고 주요 화면의 마지막 
   await page.getByRole("button", { name: "닫기", exact: true }).click();
   await expect(page.locator('[data-screen="documents"]')).toBeVisible();
   await prepare(page);
-  await page
-    .getByRole("button", { name: "다시 점검하기", exact: true })
-    .click();
+  await chooseCorrected(page);
   await page.getByRole("button", { name: "제출 내용 확인하기" }).click();
   await expect(page.locator("[data-screen=review]")).toBeVisible();
   await page.getByRole("checkbox", { name: /서류와 점검 결과를/ }).check();
@@ -207,9 +213,7 @@ test("챗봇 재시작 시 초기화하고 재점검·제출 화면은 좌우 �
   await expect(page.locator(".conditions")).toHaveCount(0);
   await expect(page.locator(".conditions")).toBeVisible();
   await prepare(page);
-  await page
-    .getByRole("button", { name: "다시 점검하기", exact: true })
-    .click();
+  await chooseCorrected(page);
   await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
   await expect(page.locator(".summary .zero")).toContainText("보완 필요0건");
   await expect(page.locator(".summary .issue")).toHaveCount(0);
@@ -235,49 +239,46 @@ test("챗봇 재시작 시 초기화하고 재점검·제출 화면은 좌우 �
   expect(rect.x + rect.width).toBeLessThanOrEqual(main.x + main.width - 19);
 });
 
-test("보완 파일을 점검해도 결과→보완 상세→재점검 완료 순서를 건너뛰지 않는다", async ({
-  page,
-}) => {
+test("선택 파일별 결과와 교체·삭제·뒤로가기가 일치한다", async ({ page }) => {
   await prepare(page);
-  await page.getByRole("button", { name: "파일 교체", exact: true }).click();
-  await page.getByRole("button", { name: /임대차계약서.pdf/ }).click();
-  await page
-    .getByRole("button", { name: "보완 서류 점검하기", exact: true })
-    .click();
-  await expect(page.locator("[data-screen=results]")).toBeVisible();
-  await expect(page.locator(".summary .issue")).toContainText("보완 필요1건");
-  await expect(page.locator(".result-card.needs-fix")).toContainText(
-    "임대차계약서",
-  );
-  await expect(page.locator(".result-card.passed")).toHaveCount(2);
-  await expect(page.locator(".result-card.staff")).toHaveCount(1);
-  await expect(page.locator(".summary")).toContainText("통과2건");
-  await expect(page.locator("[data-screen=rechecked]")).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "보완 서류 확인", exact: true })
-    .click();
-  await expect(page.locator("[data-screen=detail]")).toBeVisible();
   await page
     .getByRole("button", { name: "다시 점검하기", exact: true })
     .click();
+  await expect(page.locator("[data-screen=results]")).toBeVisible();
+  await expect(page.locator(".summary .issue")).toContainText("보완 필요1건");
+  await page
+    .getByRole("button", { name: "보완 서류 확인", exact: true })
+    .click();
+  await chooseCorrected(page);
   await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
   await expect(page.locator(".summary .zero")).toContainText("보완 필요0건");
-  await expect(page.locator(".result-card.needs-fix")).toHaveCount(0);
   await expect(page.locator(".result-card.passed")).toHaveCount(3);
-  await expect(page.locator(".summary")).toContainText("통과3건");
-  await page.evaluate(() => {
-    location.hash = "results";
-  });
-  await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
-  await page.getByRole("button", { name: "닫기", exact: true }).click();
+  await page.getByRole("button", { name: "뒤로가기", exact: true }).click();
+  await expect(page.locator(".file-heading")).toContainText(
+    "임대차계약서_보완.pdf",
+  );
+  await page.getByRole("button", { name: "교체", exact: true }).click();
   await page
-    .getByRole("button", { name: "서류 준비 시작하기", exact: true })
+    .getByRole("button", { name: "임대차계약서.pdf", exact: true })
     .click();
-  await page.getByRole("button", { name: "맞춤 준비 서류 보기" }).click();
-  await page
-    .getByRole("button", { name: "서류 준비하기", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^(보완 )?서류 점검하기$/ }).click();
+  await expect(page.locator("[data-screen=results]")).toBeVisible();
+  await expect(page.locator(".result-card.needs-fix")).toContainText(
+    "임대차계약서",
+  );
+  await expect(page.locator(".summary .issue")).toContainText("보완 필요1건");
+  await page.getByRole("button", { name: "뒤로가기", exact: true }).click();
+  await expect(page.locator(".file-heading")).toContainText("임대차계약서.pdf");
+  await page.getByRole("button", { name: "삭제", exact: true }).click();
+  await page.getByRole("button", { name: "삭제하기", exact: true }).click();
+  await expect(page.getByText("아직 등록한 서류가 없어요.")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "서류 점검하기", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: /^(보완 )?서류 점검하기$/ }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "파일 선택", exact: true }).click();
+  await page
+    .getByRole("button", { name: "임대차계약서_보완.pdf", exact: true })
+    .click();
+  await page.getByRole("button", { name: /^(보완 )?서류 점검하기$/ }).click();
+  await expect(page.locator("[data-screen=rechecked]")).toBeVisible();
 });

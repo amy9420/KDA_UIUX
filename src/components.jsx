@@ -189,7 +189,9 @@ export function DocumentPreview({
   if (!upload) return null;
   const pages = upload.type?.startsWith("image/") ? 1 : 3;
   return (
-    <div className={`document-preview ${large ? "large" : ""}`}>
+    <div
+      className={`document-preview ${large ? "large" : ""} ${upload.sampleVariant === "corrected" ? "corrected-sample" : "original-sample"}`}
+    >
       {upload.url && upload.type === "application/pdf" && large ? (
         <object
           type="application/pdf"
@@ -246,8 +248,15 @@ export function DocumentPreview({
                       </span>
                       <span className="paper-caption">
                         <b>● 제2조 (임대차 기간)</b>
-                        <em>인식 불가</em>
+                        <em>
+                          {upload.sampleVariant === "corrected"
+                            ? "정상 확인"
+                            : "인식 불가"}
+                        </em>
                         <span className="blurred-lines">
+                          {upload.sampleVariant === "corrected" && (
+                            <span>2026.01.01 ~ 2028.01.01</span>
+                          )}
                           <i />
                           <i />
                         </span>

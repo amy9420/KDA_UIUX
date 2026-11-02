@@ -17,6 +17,8 @@ import {
 } from "./components.jsx";
 import {
   DOCUMENTS,
+  SAMPLE_FILES,
+  isCorrectedSample,
   INITIAL_STATE,
   reducer,
   getResults,
@@ -52,7 +54,7 @@ const DEFAULT_BACK = {
   camera: "upload",
   results: "upload",
   detail: "results",
-  rechecked: "detail",
+  rechecked: "upload",
   requested: "detail",
   review: "rechecked",
   complete: "intro",
@@ -195,7 +197,7 @@ export default function App() {
     clearTimeout(scrollTimer.current);
     scrollTimer.current = setTimeout(() => setScrollbar(null), 800);
   };
-  const register = (file, sample = false) => {
+  const register = (file, sample = false, sampleVariant = "original") => {
     const message = sample ? "" : validateFile(file);
     if (message) {
       setError(message);
@@ -218,10 +220,13 @@ export default function App() {
     dispatch({
       type: "upload",
       value: {
-        name: sample ? "임대차계약서.pdf" : file.name,
+        name: sample
+          ? SAMPLE_FILES.find((f) => f.id === sampleVariant).name
+          : file.name,
         type: fileType,
         url,
         sample,
+        sampleVariant: sample ? sampleVariant : null,
       },
     });
     setPage(1);
@@ -261,13 +266,15 @@ export default function App() {
       }
       if (action === "check") {
         dispatch({ type: "check" });
-        // Registration always leads to the first result. Only the detail screen
-        // can advance to the completed recheck result.
-        go("results");
+        go(isCorrectedSample(state.upload) ? "rechecked" : "results");
       }
       if (action === "recheck") {
         dispatch({ type: "recheck" });
-        go("rechecked");
+        go(isCorrectedSample(state.upload) ? "rechecked" : "results");
+        if (!isCorrectedSample(state.upload))
+          setToast(
+            "같은 원본이에요. 보완 파일로 교체하거나 직원 확인을 요청해 주세요.",
+          );
       }
       if (action === "submit") {
         if (!state.receipt)
@@ -837,16 +844,27 @@ export default function App() {
               선택해 주세요
             </Heading>
             <p className="section-label">최근 파일</p>
-            <button
-              className="soft-card sample-file"
-              onClick={() => register(null, true)}
-            >
-              <b className="green">PDF</b>
-              <strong>임대차계약서.pdf</strong>
-              <small>3페이지 / 시연용 샘플</small>
-            </button>
+            <div className="sample-file-list">
+              {SAMPLE_FILES.map((file) => (
+                <button
+                  key={file.id}
+                  className="soft-card sample-file"
+                  aria-label={file.name}
+                  onClick={() => register(null, true, file.id)}
+                >
+                  <b className="green">PDF</b>
+                  <strong>{file.name}</strong>
+                  <small>
+                    3페이지 / 시연용 샘플
+                    <br />
+                    {file.description}
+                  </small>
+                </button>
+              ))}
+            </div>
             <p className="description space-top">
-              시연용 파일을 선택하면 미리보기로 이동해요.
+              원본과 보완본 중 선택해 주세요. 선택한 파일에 따라 점검 결과가
+              달라져요.
             </p>
             <Button secondary onClick={() => picker.current.click()}>
               내 기기에서 파일 선택
@@ -1008,7 +1026,7 @@ export default function App() {
               {busy ? "다시 점검하고 있어요" : "다시 점검하기"}
             </Button>
             <p className="disclaimer">
-              재점검은 수정된 샘플 결과를 보여주는 시연입니다.
+              원본은 보완 필요, 보완본은 정상 확인으로 점검돼요.
             </p>
           </div>
         ) : (

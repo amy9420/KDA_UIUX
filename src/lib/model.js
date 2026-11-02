@@ -25,6 +25,21 @@ export const DOCUMENTS = [
   },
 ];
 
+export const SAMPLE_FILES = [
+  {
+    id: "original",
+    name: "임대차계약서.pdf",
+    description: "원본 · 2페이지 계약기간 글자 흐림",
+  },
+  {
+    id: "corrected",
+    name: "임대차계약서_보완.pdf",
+    description: "보완본 · 계약기간을 선명하게 수정",
+  },
+];
+export const isCorrectedSample = (upload) =>
+  Boolean(upload?.sample && upload.sampleVariant === "corrected");
+
 export const INITIAL_STATE = {
   businessType: "개인사업자",
   purpose: "운전자금",
@@ -72,11 +87,20 @@ export function reducer(state, action) {
       };
     case "check":
       return state.upload
-        ? { ...state, checked: true, corrected: false, staffRequested: false }
+        ? {
+            ...state,
+            checked: true,
+            corrected: isCorrectedSample(state.upload),
+            staffRequested: false,
+          }
         : state;
     case "recheck":
       return state.upload && state.checked
-        ? { ...state, corrected: true, staffRequested: false }
+        ? {
+            ...state,
+            corrected: isCorrectedSample(state.upload),
+            staffRequested: false,
+          }
         : state;
     case "request":
       return state.upload && state.checked

@@ -18,6 +18,20 @@ test("서류 조회와 보완 전에는 제출할 수 없다", () => {
   state = reducer(state, { type: "check" });
   assert.equal(canSubmit(state), false);
   state = reducer(state, { type: "recheck" });
+  assert.equal(
+    canSubmit(state),
+    false,
+    "원본은 재점검만 눌러도 통과하지 않는다",
+  );
+  state = reducer(state, {
+    type: "upload",
+    value: {
+      name: "임대차계약서_보완.pdf",
+      sample: true,
+      sampleVariant: "corrected",
+    },
+  });
+  state = reducer(state, { type: "check" });
   assert.equal(canSubmit(state), true);
   assert.deepEqual(
     getResults(state).map((d) => d.status),

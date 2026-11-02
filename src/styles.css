@@ -2514,3 +2514,25 @@ b {
     letter-spacing: -0.45px;
   }
 }
+.sample-file-list {
+  display: grid;
+  gap: 12px;
+}
+.sample-file small {
+  line-height: 19px;
+}
+.corrected-sample .paper-content > .paper-caption {
+  background: #e5f7f1;
+  color: var(--dark-green);
+}
+.corrected-sample .paper-caption em {
+  color: var(--dark-green);
+}
+.corrected-sample .blurred-lines {
+  filter: none;
+  font-size: 11px;
+  color: #3d4946;
+}
+.corrected-sample .blurred-lines i {
+  background: #c5d8d1;
+}
