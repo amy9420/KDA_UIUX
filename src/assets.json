@@ -1,0 +1,690 @@
+{
+  "225:4719": {
+    "img": {
+      "src": "/figma/225-4719-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4719-imgIcon.svg",
+      "width": "18",
+      "height": "20"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4719-imgIcon1.svg",
+      "width": "15",
+      "height": "15"
+    },
+    "imgContainer": {
+      "src": "/figma/225-4719-imgContainer.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4719-imgContainer1.svg",
+      "width": "16.5",
+      "height": "14.25"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4719-imgIcon2.svg",
+      "width": "13.75",
+      "height": "13.125"
+    },
+    "imgContainer2": {
+      "src": "/figma/225-4719-imgContainer2.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgContainer3": {
+      "src": "/figma/225-4719-imgContainer3.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "225:4625": {
+    "img": {
+      "src": "/figma/225-4625-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4625-imgIcon.svg",
+      "width": "8.16667",
+      "height": "8.16667"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4625-imgIcon1.svg",
+      "width": "14.0625",
+      "height": "13.75"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4625-imgIcon2.svg",
+      "width": "12.5",
+      "height": "12.5"
+    },
+    "imgIcon3": {
+      "src": "/figma/225-4625-imgIcon3.svg",
+      "width": "12",
+      "height": "12"
+    },
+    "imgIcon4": {
+      "src": "/figma/225-4625-imgIcon4.svg",
+      "width": "16.5",
+      "height": "15.75"
+    },
+    "imgContainer": {
+      "src": "/figma/225-4625-imgContainer.svg",
+      "width": "12.8333",
+      "height": "12.8333"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4625-imgContainer1.svg",
+      "width": "11.6667",
+      "height": "15.8333"
+    },
+    "imgContainer2": {
+      "src": "/figma/225-4625-imgContainer2.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgContainer3": {
+      "src": "/figma/225-4625-imgContainer3.svg",
+      "width": "16.5",
+      "height": "19.25"
+    },
+    "imgContainer4": {
+      "src": "/figma/225-4625-imgContainer4.svg",
+      "width": "12.8333",
+      "height": "12.8333"
+    }
+  },
+  "225:4557": {
+    "imgContainer": {
+      "src": "/figma/225-4557-imgContainer.svg",
+      "width": "8.15",
+      "height": "6.0125"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4557-imgContainer1.svg",
+      "width": "6.66667",
+      "height": "8.33333"
+    },
+    "img": {
+      "src": "/figma/225-4557-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4557-imgIcon.svg",
+      "width": "16.6667",
+      "height": "16.6667"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4557-imgIcon1.svg",
+      "width": "15",
+      "height": "15"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4557-imgIcon2.svg",
+      "width": "20",
+      "height": "20"
+    },
+    "imgIcon3": {
+      "src": "/figma/225-4557-imgIcon3.svg",
+      "width": "13.3333",
+      "height": "16.6667"
+    },
+    "imgIcon4": {
+      "src": "/figma/225-4557-imgIcon4.svg",
+      "width": "16.6667",
+      "height": "15"
+    },
+    "imgIcon5": {
+      "src": "/figma/225-4557-imgIcon5.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgContainer2": {
+      "src": "/figma/225-4557-imgContainer2.svg",
+      "width": "7.4",
+      "height": "12"
+    },
+    "imgContainer3": {
+      "src": "/figma/225-4557-imgContainer3.svg",
+      "width": "18.3333",
+      "height": "16.5"
+    },
+    "imgContainer4": {
+      "src": "/figma/225-4557-imgContainer4.svg",
+      "width": "12.8333",
+      "height": "12.8333"
+    }
+  },
+  "225:4400": {
+    "img": {
+      "src": "/figma/225-4400-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgContainer": {
+      "src": "/figma/225-4400-imgContainer.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4400-imgContainer1.svg",
+      "width": "15",
+      "height": "13.5"
+    },
+    "imgContainer2": {
+      "src": "/figma/225-4400-imgContainer2.svg",
+      "width": "6.16667",
+      "height": "10"
+    },
+    "imgContainer3": {
+      "src": "/figma/225-4400-imgContainer3.svg",
+      "width": "16.5",
+      "height": "15.75"
+    },
+    "imgContainer4": {
+      "src": "/figma/225-4400-imgContainer4.svg",
+      "width": "4.93333",
+      "height": "8"
+    },
+    "imgContainer5": {
+      "src": "/figma/225-4400-imgContainer5.svg",
+      "width": "12",
+      "height": "15"
+    },
+    "imgContainer6": {
+      "src": "/figma/225-4400-imgContainer6.svg",
+      "width": "12",
+      "height": "15"
+    },
+    "imgContainer7": {
+      "src": "/figma/225-4400-imgContainer7.svg",
+      "width": "18.3333",
+      "height": "15.8333"
+    },
+    "imgContainer8": {
+      "src": "/figma/225-4400-imgContainer8.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgContainer9": {
+      "src": "/figma/225-4400-imgContainer9.svg",
+      "width": "20",
+      "height": "18"
+    }
+  },
+  "225:4322": {
+    "img": {
+      "src": "/figma/225-4322-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4322-imgIcon.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4322-imgIcon1.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4322-imgIcon2.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgIcon3": {
+      "src": "/figma/225-4322-imgIcon3.svg",
+      "width": "16.6667",
+      "height": "16.6667"
+    },
+    "imgIcon4": {
+      "src": "/figma/225-4322-imgIcon4.svg",
+      "width": "8.82917",
+      "height": "6.51354"
+    },
+    "imgIcon5": {
+      "src": "/figma/225-4322-imgIcon5.svg",
+      "width": "12",
+      "height": "13.3333"
+    },
+    "imgIcon6": {
+      "src": "/figma/225-4322-imgIcon6.svg",
+      "width": "6.16667",
+      "height": "10"
+    },
+    "imgIcon7": {
+      "src": "/figma/225-4322-imgIcon7.svg",
+      "width": "11.1042",
+      "height": "10.5625"
+    },
+    "imgIcon8": {
+      "src": "/figma/225-4322-imgIcon8.svg",
+      "width": "9.33333",
+      "height": "9.33333"
+    },
+    "imgIcon9": {
+      "src": "/figma/225-4322-imgIcon9.svg",
+      "width": "14.6667",
+      "height": "13.2"
+    },
+    "imgIcon10": {
+      "src": "/figma/225-4322-imgIcon10.svg",
+      "width": "2.16667",
+      "height": "9.75"
+    },
+    "imgIcon11": {
+      "src": "/figma/225-4322-imgIcon11.svg",
+      "width": "16.6667",
+      "height": "15"
+    },
+    "imgIcon12": {
+      "src": "/figma/225-4322-imgIcon12.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgContainer": {
+      "src": "/figma/225-4322-imgContainer.svg",
+      "width": "7.4",
+      "height": "12"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4322-imgContainer1.svg",
+      "width": "18.3333",
+      "height": "16.5"
+    }
+  },
+  "225:4249": {
+    "img": {
+      "src": "/figma/225-4249-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4249-imgIcon.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4249-imgIcon1.svg",
+      "width": "16.6667",
+      "height": "15"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4249-imgIcon2.svg",
+      "width": "14",
+      "height": "14"
+    },
+    "imgIcon3": {
+      "src": "/figma/225-4249-imgIcon3.svg",
+      "width": "11.55",
+      "height": "14"
+    },
+    "imgIcon4": {
+      "src": "/figma/225-4249-imgIcon4.svg",
+      "width": "10.5",
+      "height": "10.5"
+    },
+    "imgIcon5": {
+      "src": "/figma/225-4249-imgIcon5.svg",
+      "width": "10.6667",
+      "height": "13.3333"
+    },
+    "imgIcon6": {
+      "src": "/figma/225-4249-imgIcon6.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgContainer": {
+      "src": "/figma/225-4249-imgContainer.svg",
+      "width": "7.4",
+      "height": "12"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4249-imgContainer1.svg",
+      "width": "18.3333",
+      "height": "16.5"
+    },
+    "imgContainer2": {
+      "src": "/figma/225-4249-imgContainer2.svg",
+      "width": "12.8333",
+      "height": "12.8333"
+    }
+  },
+  "225:4167": {
+    "img": {
+      "src": "/figma/225-4167-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4167-imgIcon.svg",
+      "width": "13.3333",
+      "height": "13.3333"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4167-imgIcon1.svg",
+      "width": "12",
+      "height": "7.4"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4167-imgIcon2.svg",
+      "width": "16.6667",
+      "height": "16.6667"
+    },
+    "imgIcon3": {
+      "src": "/figma/225-4167-imgIcon3.svg",
+      "width": "16.6667",
+      "height": "16.6667"
+    },
+    "imgIcon4": {
+      "src": "/figma/225-4167-imgIcon4.svg",
+      "width": "12",
+      "height": "7.4"
+    },
+    "imgIcon5": {
+      "src": "/figma/225-4167-imgIcon5.svg",
+      "width": "6.16667",
+      "height": "10"
+    },
+    "imgIcon6": {
+      "src": "/figma/225-4167-imgIcon6.svg",
+      "width": "14.6667",
+      "height": "18.3333"
+    },
+    "imgContainer": {
+      "src": "/figma/225-4167-imgContainer.svg",
+      "width": "7.4",
+      "height": "12"
+    },
+    "imgContainer1": {
+      "src": "/figma/225-4167-imgContainer1.svg",
+      "width": "18.3333",
+      "height": "16.5"
+    },
+    "imgContainer2": {
+      "src": "/figma/225-4167-imgContainer2.svg",
+      "width": "12.8333",
+      "height": "12.8333"
+    }
+  },
+  "225:4060": {
+    "img": {
+      "src": "/figma/225-4060-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/225-4060-imgIcon.svg",
+      "width": "30",
+      "height": "30"
+    },
+    "imgIcon1": {
+      "src": "/figma/225-4060-imgIcon1.svg",
+      "width": "15",
+      "height": "15"
+    },
+    "imgIcon2": {
+      "src": "/figma/225-4060-imgIcon2.svg",
+      "width": "16.6667",
+      "height": "16.6667"
+    },
+    "imgIcon3": {
+      "src": "/figma/225-4060-imgIcon3.svg",
+      "width": "10.625",
+      "height": "12.5"
+    },
+    "imgIcon4": {
+      "src": "/figma/225-4060-imgIcon4.svg",
+      "width": "15",
+      "height": "16.6667"
+    },
+    "imgIcon5": {
+      "src": "/figma/225-4060-imgIcon5.svg",
+      "width": "13.3333",
+      "height": "13.3667"
+    },
+    "imgIcon6": {
+      "src": "/figma/225-4060-imgIcon6.svg",
+      "width": "12",
+      "height": "13.3333"
+    },
+    "imgIcon7": {
+      "src": "/figma/225-4060-imgIcon7.svg",
+      "width": "10.6667",
+      "height": "13.3333"
+    },
+    "imgIcon8": {
+      "src": "/figma/225-4060-imgIcon8.svg",
+      "width": "12.8333",
+      "height": "12.8333"
+    },
+    "imgIcon9": {
+      "src": "/figma/225-4060-imgIcon9.svg",
+      "width": "18.3333",
+      "height": "16.5"
+    },
+    "imgIcon10": {
+      "src": "/figma/225-4060-imgIcon10.svg",
+      "width": "7.4",
+      "height": "12"
+    }
+  },
+  "235:638": {
+    "img": {
+      "src": "/figma/235-638-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-638-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-638-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:418": {
+    "img": {
+      "src": "/figma/235-418-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-418-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-418-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:445": {
+    "img": {
+      "src": "/figma/235-445-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-445-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-445-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:475": {
+    "img": {
+      "src": "/figma/235-475-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-475-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-475-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:505": {
+    "img": {
+      "src": "/figma/235-505-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-505-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-505-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    },
+    "imgBasilFileUploadOutline": {
+      "src": "/figma/235-505-imgBasilFileUploadOutline.svg",
+      "width": "25",
+      "height": "25"
+    }
+  },
+  "235:535": {
+    "img": {
+      "src": "/figma/235-535-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-535-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-535-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:560": {
+    "img": {
+      "src": "/figma/235-560-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-560-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-560-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:582": {
+    "img": {
+      "src": "/figma/235-582-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/235-582-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/235-582-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "235:617": {},
+  "235:627": {},
+  "237:417": {
+    "img": {
+      "src": "/figma/237-417-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/237-417-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/237-417-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "237:457": {
+    "img": {
+      "src": "/figma/237-457-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/237-457-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/237-457-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "237:480": {},
+  "240:417": {
+    "img": {
+      "src": "/figma/240-417-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/240-417-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/240-417-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  },
+  "240:457": {
+    "img": {
+      "src": "/figma/240-457-img.png",
+      "width": null,
+      "height": null
+    },
+    "imgIcon": {
+      "src": "/figma/240-457-imgIcon.svg",
+      "width": "16",
+      "height": "16"
+    },
+    "imgIcon1": {
+      "src": "/figma/240-457-imgIcon1.svg",
+      "width": "16.5",
+      "height": "19.25"
+    }
+  }
+}
